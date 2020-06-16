@@ -165,7 +165,7 @@ int readSigprocHeader(datafile_definition *datafile, verbose_definition verbose)
  printf("DEBUG: %s=%s\n", id, txt);
       }
       if(set_psrname_PSRData(datafile, txt, verbose) == 0) {
- printerror(verbose.debug,"ERROR readSigprocHeader: Setting observatory failed");
+ printerror(verbose.debug,"ERROR readSigprocHeader: Setting source_name failed");
  return 0;
       }
       free(txt);
@@ -284,7 +284,7 @@ int readSigprocHeader(datafile_definition *datafile, verbose_definition verbose)
       datafile->isFolded = 1;
       datafile->foldMode = FOLDMODE_FIXEDPERIOD;
       datafile->fixedPeriod = dummy_double;
-    }else if(strcmp(id, "barycentric") == 0 || strcmp(id, "pulsarcentric") == 0 || strcmp(id, "nsamples") == 0) {
+    }else if(strcmp(id, "barycentric") == 0 || strcmp(id, "pulsarcentric") == 0 || strcmp(id, "nsamples") == 0 || strcmp(id, "nbeams") == 0 || strcmp(id, "ibeam") == 0) {
       if(fread(&dummy_int, sizeof(int), 1, datafile->fptr) != 1) {
  printerror(verbose.debug,"ERROR readSigprocHeader: Read error");
  return 0;
@@ -300,6 +300,17 @@ int readSigprocHeader(datafile_definition *datafile, verbose_definition verbose)
       if(verbose.debug) {
  printf("DEBUG: %s=%lf\n", id, dummy_double);
       }
+    }else if(strcmp(id, "rawdatafile") == 0) {
+      char *txt;
+      txt = NULL;
+      if(readSigprocHeader_readParamID(datafile->fptr, &txt, verbose) == 0) {
+ printerror(verbose.debug, "ERROR readSigprocHeader: Cannot read string");
+ return 0;
+      }
+      if(verbose.debug) {
+ printf("DEBUG: %s=%s\n", id, txt);
+      }
+      free(txt);
     }else if(strcmp(id, "HEADER_END") == 0) {
     }else {
       printerror(verbose.debug,"ERROR readSigprocHeader: ID=%s is not recognized", id);
